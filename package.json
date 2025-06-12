@@ -1,9 +1,14 @@
 {
-  "name": "equipmenthaul-proxy",
+  "name": "equipmenthaul-functions",
   "version": "1.0.0",
   "main": "index.js",
-  "license": "MIT",
+  "engines": {
+    "node": "18"
+  },
   "dependencies": {
-    "nodemailer": "^6.9.3"
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "firebase-functions": "^4.4.1",
+    "nodemailer": "^6.9.4"
   }
 }
