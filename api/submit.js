@@ -1,17 +1,15 @@
 const nodemailer = require("nodemailer");
 
 module.exports = async (req, res) => {
-  // ✅ Set CORS headers
+  // ✅ CORS headers
   res.setHeader("Access-Control-Allow-Origin", "https://equipmenthaul.com");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  // ✅ Handle preflight (OPTIONS) request
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
 
-  // ✅ Only allow POST
   if (req.method !== "POST") {
     return res.status(405).json({ status: "error", message: "Method Not Allowed" });
   }
@@ -26,30 +24,27 @@ module.exports = async (req, res) => {
       body: JSON.stringify(data)
     });
 
-    // ✅ Format equipment list for email
-    const equipmentDetails = data.equipment.map((item, i) => `
-      Item ${i + 1}:
-      - Name: ${item.name}
-      - Weight: ${item.weight} lbs
-      - Dimensions: ${item.dimensions}
-    `).join("\n\n");
+    // ✅ Format equipment section for email
+    const equipmentDetails = data.equipment.map(item => `
+  - Name: ${item.name}
+  - Weight: ${item.weight} lbs
+  - Dimensions: ${item.dimensions}
+`).join("\n");
 
-    const message = `New equipment haul request:\n\n
-Company: ${data.company}
-Customer Name: ${data.name}
-Email: ${data.email}
-Phone: ${data.phone}
-
+    // ✅ Format full email message
+    const message = `
 Pickup Address: ${data.pickup_address}
 Drop-off Address: ${data.dropoff_address}
-Pickup Time: ${data.pickup_time}
-${data.pickup_time === 'Scheduled' ? `Scheduled for ${data.scheduled_date} at ${data.scheduled_time}` : ''}
+Pickup Time: ${data.pickup_time === 'Scheduled' ? `${data.scheduled_date} at ${data.scheduled_time}` : 'ASAP'}
 
-Delivery Contact: ${data.delivery_contact_name} (${data.delivery_contact_phone})
+Equipment Details:
+${equipmentDetails}
 
-Equipment Details:\n\n${equipmentDetails}`;
+Delivery Contact: ${data.delivery_contact_name}
+Delivery Contact Number: ${data.delivery_contact_phone}
+`;
 
-    // ✅ Send email using Gmail
+    // ✅ Send email via Gmail
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
