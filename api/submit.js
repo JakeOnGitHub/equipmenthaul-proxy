@@ -1,6 +1,17 @@
 const nodemailer = require("nodemailer");
 
 module.exports = async (req, res) => {
+  // ✅ Set CORS headers
+  res.setHeader("Access-Control-Allow-Origin", "https://equipmenthaul.com");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  // ✅ Handle preflight (OPTIONS) request
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
+  // ✅ Only allow POST
   if (req.method !== "POST") {
     return res.status(405).json({ status: "error", message: "Method Not Allowed" });
   }
@@ -8,14 +19,14 @@ module.exports = async (req, res) => {
   const data = req.body;
 
   try {
-    // Send to Google Apps Script
+    // ✅ Send to Google Apps Script
     await fetch("https://script.google.com/macros/s/AKfycbx0risrNQ5MaEZpAFI0rfB6e9Xlp9p8wDDdQl-blMhovB-uxvCN96tTXD_eMXlE32pR9g/exec", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data)
     });
 
-    // Prepare email content
+    // ✅ Format equipment list for email
     const equipmentDetails = data.equipment.map((item, i) => `
       Item ${i + 1}:
       - Name: ${item.name}
@@ -38,7 +49,7 @@ Delivery Contact: ${data.delivery_contact_name} (${data.delivery_contact_phone})
 
 Equipment Details:\n\n${equipmentDetails}`;
 
-    // Send email
+    // ✅ Send email using Gmail
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
