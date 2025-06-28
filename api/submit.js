@@ -1,10 +1,10 @@
+import fetch from 'node-fetch';
+
 export default async function handler(req, res) {
-  // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', 'https://equipmenthaul.com');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // Respond early to OPTIONS preflight request
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
@@ -27,10 +27,10 @@ export default async function handler(req, res) {
     if (data.status === 'ok') {
       return res.status(200).json({ status: 'ok' });
     } else {
-      return res.status(500).json({ status: 'error', message: 'Google Apps Script returned an error' });
+      return res.status(500).json({ status: 'error', message: 'Google Apps Script error', detail: data });
     }
   } catch (err) {
-    console.error('Forwarding error:', err);
-    return res.status(500).json({ status: 'error', message: err.message || 'Unknown server error' });
+    console.error('Proxy failed:', err);
+    return res.status(500).json({ status: 'error', message: err.message });
   }
 }
